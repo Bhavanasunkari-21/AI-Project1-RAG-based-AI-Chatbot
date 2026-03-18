@@ -19,13 +19,20 @@ Every answer includes a Sources panel showing exactly which file and page number
 
 ##What It Does
 
-•	Accepts up to 10 PDFs simultaneously in a single upload batch
-•	Validates file sizes before processing — 10 MB per file, 50 MB total
-•	Splits all documents into overlapping chunks and indexes them together into one searchable vector database
-•	At query time, retrieves the most relevant chunks from across the entire document set — not just one file
-•	Generates a single grounded answer synthesised from multiple sources
-•	Cites the exact file name and page number for every piece of retrieved content
-•	Preserves full chat history so you can ask follow-up questions across sessions
+•	Accepts up to 10 PDFs simultaneously in a single upload batch.
+
+•	Validates file sizes before processing — 10 MB per file, 50 MB total.
+
+•	Splits all documents into overlapping chunks and indexes them together into one searchable vector database.
+
+•	At query time, retrieves the most relevant chunks from across the entire document set — not just one file.
+
+•	Generates a single grounded answer synthesised from multiple sources.
+
+•	Cites the exact file name and page number for every piece of retrieved content.
+
+•	Preserves full chat history so you can ask follow-up questions across sessions.
+
 •	Automatically handles API rate limits with retry logic and model fallback
 
 ##How It Works
@@ -67,7 +74,7 @@ Google Gemini 2.0 Flash  --  grounded answer with cross-document synthesis
       v
 Answer + collapsible Sources panel (file name + page number for every chunk used)
 
-Real-World Use Cases
+##Real-World Use Cases
 
 Recruitment
 Upload: 5 candidate resumes + 1 job description.  Ask: "Rank these candidates by fit and explain the gaps for each."  The system reads all six files and returns a ranked comparison in one response, citing which resume page each assessment came from.
@@ -84,6 +91,7 @@ Upload: HR handbook + role-specific guide + org chart + benefits document.  Ask:
 Financial analysis
 Upload: Annual reports from three competitor companies.  Ask: "Compare R&D spending as a percentage of revenue across all three."  The system extracts and compares the relevant figures from all three reports simultaneously.
 
+
 ##Technology Stack
 
 Component	Technology and detail
@@ -94,7 +102,7 @@ PDF parsing	PyPDFLoader (LangChain)  —  page-by-page with source metadata tagg
 Text splitting	RecursiveCharacterTextSplitter  —  1000-char chunks, 150-char overlap
 Interface	Streamlit  —  session-aware chat UI with live upload progress
 
-Rate Limits and Automatic Fallback
+##Rate Limits and Automatic Fallback
 The system handles Google API quota errors automatically. When a 429 error is returned, it waits the exact delay suggested in the error response and retries up to 3 times. If the quota is exhausted, it silently switches to the next model in the chain:
 
 gemini-2.0-flash-lite  ->  gemini-2.0-flash  ->  gemini-2.0-flash-001  ->  gemini-2.5-flash  ->  gemini-2.5-pro
@@ -103,6 +111,7 @@ Model	Free requests/min	Free requests/day
 gemini-2.0-flash-lite	30 RPM	1,500
 gemini-2.0-flash	15 RPM	1,500
 gemini-2.5-flash	10 RPM	500
+
 
 ##Setup and Installation
 
@@ -119,34 +128,53 @@ source venv/bin/activate      # macOS / Linux
 pip install -r requirements.txt
 
 # Or manually:
+
 pip install streamlit python-dotenv google-genai \
+
             langchain langchain-core langchain-community \
+            
             langchain-huggingface sentence-transformers \
             chromadb pypdf
 
 4.  Add your Google API key
-Create a .env file in the project root:
+   
+5.  Create a .env file in the project root:
 GOOGLE_API_KEY=AIza...your_key_here
-Get a free key at https://aistudio.google.com/app/apikey
 
-5.  Run the app
+6. Get a free key at https://aistudio.google.com/app/apikey
+
+8.  Run the app
 streamlit run app.py
 
 
-Project Demo Gif
-![Demo](demo.gif)
+
+
 
 Project Structure
+
+
 AI-Project1-RAG-based-AI-Chatbot/
+
 |
 |-- app.py                # Main application  --  upload, index, chat, retry logic
+
 |-- requirements.txt      # All dependencies
+
 |-- .env                  # Your API key  (never commit this)
+
 |-- .gitignore            # Excludes venv/, chroma_db_*/, tempDir/, .env
+
 L-- README.md
 
+
+
+
 Security Notes
+
 •	Never commit the .env file — it is excluded by .gitignore
+
 •	Uploaded PDFs are written to tempDir/ for processing and never stored permanently
+
 •	ChromaDB indexes are local to your machine and not transmitted anywhere
+
 •	This project is intended for local development and experimentation
